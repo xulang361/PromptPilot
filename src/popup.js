@@ -220,7 +220,7 @@ function setStatus(message, keepVisible = false) {
 }
 
 function getDefaultModel(provider) {
-  if (provider === "mimo") return "MiMo-V2.5-Pro";
+  if (provider === "mimo") return "mimo-v2.5-pro";
   return "gpt-5.5";
 }
 

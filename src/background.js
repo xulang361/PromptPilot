@@ -99,7 +99,7 @@ async function generatePrompt(payload = {}) {
   ]);
   const provider = apiProvider || "openai";
   const key = apiKey || openaiApiKey;
-  const model = apiModel || openaiModel || getDefaultModel(provider);
+  const model = normalizeModel(provider, apiModel || openaiModel || getDefaultModel(provider));
   const baseUrl = normalizeBaseUrl(apiBaseUrl || getDefaultBaseUrl(provider));
 
   if (!key) {
@@ -157,7 +157,7 @@ async function generateWithChatCompletions({ key, model, baseUrl, payload }) {
         { role: "system", content: buildGenerationInstructions() },
         { role: "user", content: buildGenerationInput(payload) }
       ],
-      max_tokens: 700,
+      max_completion_tokens: 900,
       temperature: 0.7,
       top_p: 0.95
     })
@@ -181,6 +181,7 @@ function buildGenerationInstructions() {
     "You generate text that will be pasted into an input field on an AI tool website.",
     "Infer the target input type from page context, focused field metadata, labels, placeholders, nearby text, URL, and user goal.",
     "Return only the final text to paste. Do not include explanations, headings, code fences, or surrounding quotes.",
+    "For OpenAI-compatible Chat Completions, put the final pasteable text in message.content.",
     "Avoid entering credentials, private personal data, payment data, or anything that looks like a login/signup field.",
     "If the field appears to be for image, video, SEO, landing page, workflow, product, or chat prompts, produce a practical high-quality prompt tailored to that context.",
     "Prefer English output for overseas/AI SaaS contexts unless the user goal clearly asks for Chinese."
@@ -220,7 +221,15 @@ function extractOutputText(data) {
 function extractChatCompletionText(data) {
   return (data.choices || [])
     .map((choice) => {
-      const content = choice.message?.content;
+      const message = choice.message || {};
+      const delta = choice.delta || {};
+      const content =
+        message.content ||
+        message.reasoning_content ||
+        message.reasoning ||
+        delta.content ||
+        delta.reasoning_content ||
+        delta.reasoning;
       if (Array.isArray(content)) {
         return content
           .map((part) => part.text || part.content || "")
@@ -233,8 +242,13 @@ function extractChatCompletionText(data) {
 }
 
 function getDefaultModel(provider) {
-  if (provider === "mimo") return "MiMo-V2.5-Pro";
+  if (provider === "mimo") return "mimo-v2.5-pro";
   return "gpt-5.5";
+}
+
+function normalizeModel(provider, model) {
+  if (provider === "mimo") return String(model || "").trim().toLowerCase();
+  return String(model || "").trim();
 }
 
 function getDefaultBaseUrl(provider) {

@@ -35,7 +35,7 @@
 3. 填入你的 API Key。
 4. 填入模型。
    - Mimo Base URL：`https://token-plan-cn.xiaomimimo.com/v1`
-   - Mimo 默认模型：`MiMo-V2.5-Pro`
+   - Mimo 默认模型：`mimo-v2.5-pro`
    - OpenAI 默认：`gpt-5.5`
 4. 在文本框里写一个生成目标，例如「生成适合这个 AI 图片工具的英文测试 prompt」。
 5. 点击「根据页面生成」。
