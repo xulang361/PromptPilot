@@ -99,16 +99,16 @@ fillButton.addEventListener("click", async () => {
       text,
       mode: "replace"
     });
-    setStatus(response?.ok ? "已填入当前页面。" : "没找到可输入区域，请先点一下输入框。");
+    setStatus(response?.ok ? "已填入当前页面。" : "没找到可输入区域，请先点一下输入框。", !response?.ok);
   } catch (error) {
-    setStatus("当前页面暂不允许注入，请刷新页面后再试。");
+    setStatus("当前页面暂不允许注入，请刷新页面后再试。", true);
   }
 });
 
 generateButton.addEventListener("click", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) {
-    setStatus("没有找到当前标签页。");
+    setStatus("没有找到当前标签页。", true);
     return;
   }
 
@@ -121,7 +121,7 @@ generateButton.addEventListener("click", async () => {
     });
 
     if (!contextResponse?.ok) {
-      setStatus("无法读取当前页面，请刷新后再试。");
+      setStatus("无法读取当前页面，请刷新后再试。", true);
       return;
     }
 
@@ -135,20 +135,24 @@ generateButton.addEventListener("click", async () => {
     });
 
     if (!generationResponse?.ok) {
-      setStatus(generationResponse?.error || "生成失败。");
+      setStatus(generationResponse?.error || "生成失败。", true);
       return;
     }
 
     promptInput.value = generationResponse.text;
     await chrome.storage.local.set({ lastPromptText: generationResponse.text });
-    await chrome.tabs.sendMessage(tab.id, {
-      type: "PROMPT_FLOW_FILL",
-      text: generationResponse.text,
-      mode: "replace"
-    });
-    setStatus("已根据页面生成并填入。");
+    try {
+      await chrome.tabs.sendMessage(tab.id, {
+        type: "PROMPT_FLOW_FILL",
+        text: generationResponse.text,
+        mode: "replace"
+      });
+      setStatus("已根据页面生成并填入。");
+    } catch (error) {
+      setStatus("已生成 Prompt，但当前页面暂时无法自动填入。", true);
+    }
   } catch (error) {
-    setStatus(error?.message || "生成失败，请检查 API Key 和页面权限。");
+    setStatus(error?.message || "生成失败，请检查 API Key 和页面权限。", true);
   } finally {
     generateButton.disabled = false;
   }
@@ -206,9 +210,10 @@ function loadSelectedPrompt() {
   promptInput.value = selected?.text || "";
 }
 
-function setStatus(message) {
+function setStatus(message, keepVisible = false) {
   statusElement.textContent = message;
   window.clearTimeout(setStatus.timer);
+  if (keepVisible) return;
   setStatus.timer = window.setTimeout(() => {
     statusElement.textContent = "";
   }, 2400);

@@ -157,7 +157,7 @@ async function generateWithChatCompletions({ key, model, baseUrl, payload }) {
         { role: "system", content: buildGenerationInstructions() },
         { role: "user", content: buildGenerationInput(payload) }
       ],
-      max_completion_tokens: 700,
+      max_tokens: 700,
       temperature: 0.7,
       top_p: 0.95
     })
@@ -219,7 +219,15 @@ function extractOutputText(data) {
 
 function extractChatCompletionText(data) {
   return (data.choices || [])
-    .map((choice) => choice.message?.content || "")
+    .map((choice) => {
+      const content = choice.message?.content;
+      if (Array.isArray(content)) {
+        return content
+          .map((part) => part.text || part.content || "")
+          .join("");
+      }
+      return content || choice.text || "";
+    })
     .filter(Boolean)
     .join("\n");
 }
