@@ -101,7 +101,7 @@ fillButton.addEventListener("click", async () => {
     });
     setStatus(response?.ok ? "已填入当前页面。" : "没找到可输入区域，请先点一下输入框。", !response?.ok);
   } catch (error) {
-    setStatus("当前页面暂不允许注入，请刷新页面后再试。", true);
+    setStatus(getPageConnectionErrorMessage(error), true);
   }
 });
 
@@ -116,9 +116,15 @@ generateButton.addEventListener("click", async () => {
   setStatus("正在读取页面上下文...");
 
   try {
-    const contextResponse = await chrome.tabs.sendMessage(tab.id, {
-      type: "PROMPT_FLOW_CONTEXT"
-    });
+    let contextResponse;
+    try {
+      contextResponse = await chrome.tabs.sendMessage(tab.id, {
+        type: "PROMPT_FLOW_CONTEXT"
+      });
+    } catch (error) {
+      setStatus(getPageConnectionErrorMessage(error), true);
+      return;
+    }
 
     if (!contextResponse?.ok) {
       setStatus("无法读取当前页面，请刷新后再试。", true);
@@ -149,7 +155,7 @@ generateButton.addEventListener("click", async () => {
       });
       setStatus("已根据页面生成并填入。");
     } catch (error) {
-      setStatus("已生成 Prompt，但当前页面暂时无法自动填入。", true);
+      setStatus("已生成 Prompt，但需要刷新当前网页后才能自动填入。", true);
     }
   } catch (error) {
     setStatus(error?.message || "生成失败，请检查 API Key 和页面权限。", true);
@@ -227,4 +233,13 @@ function getDefaultModel(provider) {
 function getDefaultBaseUrl(provider) {
   if (provider === "mimo") return "https://token-plan-cn.xiaomimimo.com/v1";
   return "https://api.openai.com/v1";
+}
+
+function getPageConnectionErrorMessage(error) {
+  const message = error?.message || "";
+  if (message.includes("Receiving end does not exist")) {
+    return "插件已更新，请先刷新当前网页后再生成。Chrome 内部页和扩展商店页面不支持注入。";
+  }
+
+  return "当前页面暂不允许注入，请刷新页面后再试。";
 }
