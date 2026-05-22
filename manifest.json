@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Prompt Flow Autofill",
+  "description": "Prompt presets and one-click autofill for trying AI tools and prompt workflows.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "Prompt Flow Autofill",
+    "default_popup": "src/popup.html"
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "fill-last-prompt": {
+      "suggested_key": {
+        "default": "Alt+Shift+P",
+        "mac": "Alt+Shift+P"
+      },
+      "description": "Fill the last used prompt into the current input"
+    }
+  },
+  "permissions": ["activeTab", "contextMenus", "storage"],
+  "host_permissions": [
+    "<all_urls>",
+    "https://api.openai.com/*",
+    "https://api.mimo-v2.com/*",
+    "https://token-plan-cn.xiaomimimo.com/*"
+  ]
+}

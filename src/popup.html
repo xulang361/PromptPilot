@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prompt Flow Autofill</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <h1>Prompt Flow</h1>
+          <p>AI 工具试用填充器</p>
+        </div>
+        <button id="newPromptButton" class="icon-button" title="新增 Prompt" type="button">+</button>
+      </header>
+
+      <section class="editor" aria-label="Prompt editor">
+        <details class="settings">
+          <summary>API 设置</summary>
+          <label>
+            供应商
+            <select id="providerSelect">
+              <option value="mimo">Mimo</option>
+              <option value="openai">OpenAI</option>
+            </select>
+          </label>
+          <label>
+            API Key
+            <input id="apiKeyInput" type="password" autocomplete="off" placeholder="tp-... 或 sk-..." />
+          </label>
+          <label>
+            Base URL
+            <input id="baseUrlInput" placeholder="https://token-plan-cn.xiaomimimo.com/v1" />
+          </label>
+          <label>
+            模型
+            <input id="modelInput" value="MiMo-V2.5-Pro" placeholder="MiMo-V2.5-Pro" />
+          </label>
+          <button id="saveSettingsButton" type="button">保存设置</button>
+        </details>
+
+        <label>
+          标题
+          <input id="titleInput" maxlength="48" placeholder="例如：出海站长 SEO 测试" />
+        </label>
+        <label>
+          生成目标 / Prompt
+          <textarea id="promptInput" rows="7" placeholder="写入你的目标，例如：帮我生成一个适合当前 AI 工具的测试输入"></textarea>
+        </label>
+        <div class="actions">
+          <button id="saveButton" type="button">保存</button>
+          <button id="generateButton" type="button">根据页面生成</button>
+          <button id="fillButton" class="primary" type="button">填入当前页面</button>
+        </div>
+        <p id="status" class="status" role="status"></p>
+      </section>
+
+      <section class="library" aria-label="Prompt library">
+        <div class="section-heading">
+          <h2>常用 Prompt</h2>
+          <button id="deleteButton" class="text-button" type="button">删除</button>
+        </div>
+        <div id="promptList" class="prompt-list"></div>
+      </section>
+    </main>
+    <script src="./popup.js"></script>
+  </body>
+</html>
