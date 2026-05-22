@@ -1,6 +1,6 @@
-# Prompt Flow Autofill
+# PromptPilot
 
-一个面向 AI 工具试用者、AI 出海站长和 Prompt 工作流用户的 Chrome MV3 插件原型。
+一个面向 AI 工具试用者、AI 出海站长和 Prompt 工作流用户的 Chrome 插件：根据当前页面上下文生成合适的输入内容，并一键填入网页输入框。
 
 ## 当前能力
 

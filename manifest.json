@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Prompt Flow Autofill",
-  "description": "Prompt presets and one-click autofill for trying AI tools and prompt workflows.",
+  "name": "PromptPilot",
+  "description": "Generate and autofill context-aware prompts for testing AI tools, building overseas AI sites, and running prompt workflows.",
   "version": "0.1.0",
   "action": {
-    "default_title": "Prompt Flow Autofill",
+    "default_title": "PromptPilot",
     "default_popup": "src/popup.html"
   },
   "background": {
